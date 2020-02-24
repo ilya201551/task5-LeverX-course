@@ -1,6 +1,7 @@
 from .models import (AdvUser,
                      Course,
-                     Lecture)
+                     Lecture,
+                     )
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -52,6 +53,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CoursesListSerializer(serializers.ModelSerializer):
 
+    name = serializers.CharField(min_length=5, max_length=100, validators=[UniqueValidator(
+        queryset=Course.objects.all(),
+        message='Course already exist.'
+    )])
+    lectures = serializers.StringRelatedField(many=True, read_only=True)
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def validate(self, data):
@@ -72,6 +78,7 @@ class CoursesListSerializer(serializers.ModelSerializer):
                   'name',
                   'students',
                   'professors',
+                  'lectures',
                   ]
 
 
@@ -98,4 +105,24 @@ class CoursesDetailSerializer(serializers.ModelSerializer):
                   'students',
                   'professors',
                   'lectures',
+                  ]
+
+
+class CoursesStudentsListSerializer(serializers.ModelSerializer):
+
+    students = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ['students',
+                  ]
+
+
+class CoursesProfessorsListSerializer(serializers.ModelSerializer):
+
+    professors = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ['professors',
                   ]

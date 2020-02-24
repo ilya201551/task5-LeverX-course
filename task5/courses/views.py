@@ -4,6 +4,8 @@ from .serializers import (UserRegistrationSerializer,
                           UserSerializer,
                           CoursesListSerializer,
                           CoursesDetailSerializer,
+                          CoursesStudentsListSerializer,
+                          CoursesProfessorsListSerializer,
                           )
 from .permissions import (IsOwnerOrReadOnly,
                           IsProfessorOrReadOnly,
@@ -91,6 +93,32 @@ class CoursesDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated,
                           IsOwnerOrReadOnly]
     serializer_class = CoursesDetailSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.status == 'P':
+            queryset = Course.objects.filter(professors=user)
+        else:
+            queryset = Course.objects.filter(students=user)
+        return queryset
+
+
+class CoursesStudentsListView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CoursesStudentsListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.status == 'P':
+            queryset = Course.objects.filter(professors=user)
+        else:
+            queryset = Course.objects.filter(students=user)
+        return queryset
+
+
+class CoursesProfessorsListView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CoursesProfessorsListSerializer
 
     def get_queryset(self):
         user = self.request.user
