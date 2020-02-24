@@ -12,7 +12,6 @@ from .permissions import (IsOwnerOrReadOnly,
                           )
 from rest_framework import (generics,
                             status,
-                            serializers,
                             )
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -127,3 +126,5 @@ class CoursesProfessorsListView(generics.RetrieveAPIView):
         else:
             queryset = Course.objects.filter(students=user)
         return queryset
+
+

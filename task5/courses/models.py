@@ -37,11 +37,19 @@ class Homework(models.Model):
         return f'{self.task}'
 
 
+class Mark(models.Model):
+    value = models.SmallIntegerField(blank=False)
+    owner = models.ForeignKey(AdvUser, on_delete=models.CASCADE, blank=False)
+
+    def __str__(self):
+        return f'Mark - {self.value}'
+
+
 class FinishedHomework(models.Model):
     solution = models.TextField(blank=True)
     finished = models.BooleanField(blank=False, default=False)
-    mark = models.SmallIntegerField(blank=True)
-    owner = models.ForeignKey(AdvUser, blank=False, on_delete=models.CASCADE)
+    owner = models.ForeignKey(AdvUser, on_delete=models.CASCADE, blank=False)
+    mark = models.OneToOneField(Mark, on_delete=models.CASCADE, blank=False)
 
     def __str__(self):
         return f'{self.solution}'
@@ -50,6 +58,7 @@ class FinishedHomework(models.Model):
 class Comment(models.Model):
     text = models.TextField(blank=False)
     owner = models.ForeignKey(AdvUser, blank=False, on_delete=models.CASCADE)
+    mark = models.ForeignKey(Mark, on_delete=models.CASCADE, blank=True)
 
     def __str__(self):
-        return f'{self.text}'
+        return f'{self.owner} comment.'

@@ -3,6 +3,7 @@ from .models import (AdvUser,
                      Lecture,
                      Homework,
                      Course,
+                     Mark,
                      FinishedHomework,
                      Comment,
                      )
@@ -24,6 +25,11 @@ class HomeworkAdmin(admin.ModelAdmin):
 
 
 @admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Mark)
 class CourseAdmin(admin.ModelAdmin):
     pass
 
