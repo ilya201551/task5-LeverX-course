@@ -3,7 +3,9 @@ from .models import (AdvUser,
                      Lecture,
                      )
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import (UniqueValidator,
+                                       UniqueTogetherValidator,
+                                       )
 
 
 """User serializers"""
@@ -51,7 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
 """Courses serializers"""
 
 
-class CoursesListSerializer(serializers.ModelSerializer):
+class CoursesSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField(min_length=5, max_length=100, validators=[UniqueValidator(
         queryset=Course.objects.all(),
@@ -59,32 +61,6 @@ class CoursesListSerializer(serializers.ModelSerializer):
     )])
     lectures = serializers.StringRelatedField(many=True, read_only=True)
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    def validate(self, data):
-        if 'professors' in data.keys():
-            for i in data['professors']:
-                if i.status != 'P':
-                    raise serializers.ValidationError("Only professors can be added.")
-        if 'students' in data.keys():
-            for i in data['students']:
-                if i.status != 'S':
-                    raise serializers.ValidationError("Only students can be added.")
-        return data
-
-    class Meta:
-        model = Course
-        fields = ['id',
-                  'owner',
-                  'name',
-                  'students',
-                  'professors',
-                  'lectures',
-                  ]
-
-
-class CoursesDetailSerializer(serializers.ModelSerializer):
-
-    lectures = serializers.StringRelatedField(many=True, read_only=True)
 
     def validate(self, data):
         if 'professors' in data.keys():
@@ -125,4 +101,27 @@ class CoursesProfessorsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['professors',
+                  ]
+
+
+"""Lectures serializers"""
+
+
+class LecturesSerializer(serializers.ModelSerializer):
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    tasks = serializers.StringRelatedField(many=True, read_only=True)
+
+    class Meta:
+        validators = [UniqueTogetherValidator(queryset=Lecture.objects.all(),
+                                              fields=['topic', 'course'],
+                                              )
+                      ]
+        model = Lecture
+        fields = ['id',
+                  'owner',
+                  'topic',
+                  'presentation',
+                  'tasks',
+                  'course',
                   ]

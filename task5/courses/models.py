@@ -31,7 +31,7 @@ class Lecture(models.Model):
 
 class Homework(models.Model):
     task = models.TextField(blank=False)
-    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, blank=False)
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, blank=False, related_name='tasks')
 
     def __str__(self):
         return f'{self.task}'
