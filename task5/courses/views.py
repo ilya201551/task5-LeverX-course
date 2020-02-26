@@ -1,13 +1,17 @@
 from .models import (AdvUser,
                      Course,
                      Lecture,
+                     Homework,
                      )
 from .serializers import (UserRegistrationSerializer,
                           UserSerializer,
                           CoursesSerializer,
                           CoursesStudentsListSerializer,
                           CoursesProfessorsListSerializer,
-                          LecturesSerializer,
+                          CoursesLecturesListSerializer,
+                          LecturesListSerializer,
+                          LecturesDetailSerializer,
+                          HomeworkSerializer,
                           )
 from .permissions import (IsOwnerOrReadOnly,
                           IsThisUserOrReadOnly,
@@ -16,6 +20,7 @@ from .permissions import (IsOwnerOrReadOnly,
 from rest_framework import (generics,
                             status,
                             viewsets,
+                            parsers,
                             )
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -114,21 +119,23 @@ class CoursesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data,
                         status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def lectures(self, request, pk=None):
+        data = Course.objects.get(pk=pk)
+        serializer = CoursesLecturesListSerializer(data)
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
 
-class LecturesViewSet(viewsets.ModelViewSet):
 
-    def get_permissions(self):
-        if self.action == 'list' or self.action == 'create':
-            permission_classes = [IsAuthenticated,
-                                  IsProfessorOrReadOnly,
-                                  ]
-        else:
-            permission_classes = [IsAuthenticated,
-                                  IsOwnerOrReadOnly,
-                                  ]
-        return [permission() for permission in permission_classes]
+"""Lectures views"""
 
-    serializer_class = LecturesSerializer
+
+class LecturesListView(generics.ListCreateAPIView):
+
+    permission_classes = [IsAuthenticated,
+                          IsProfessorOrReadOnly,
+                          ]
+    serializer_class = LecturesListSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -139,3 +146,52 @@ class LecturesViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class LecturesDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+        permission_classes = [IsAuthenticated,
+                              IsOwnerOrReadOnly,
+                              ]
+        serializer_class = LecturesDetailSerializer
+
+        def get_queryset(self):
+            user = self.request.user
+            if user.status == 'P':
+                queryset = Lecture.objects.filter(course__professors=user)
+            else:
+                queryset = Lecture.objects.filter(course__students=user)
+            return queryset
+
+
+"""Homework views"""
+
+
+class HomeworkListView(generics.ListCreateAPIView):
+
+    permission_classes = [IsAuthenticated,
+                          IsProfessorOrReadOnly,
+                          ]
+    serializer_class = HomeworkSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.status == 'P':
+            queryset = Homework.objects.filter(lecture__course__professors=user)
+        else:
+            queryset = Homework.objects.filter(lecture__course__students=user)
+        return queryset
+
+
+class HomeworkDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+        permission_classes = [IsAuthenticated,
+                              IsProfessorOrReadOnly,
+                              ]
+        serializer_class = HomeworkSerializer
+
+        def get_queryset(self):
+            user = self.request.user
+            if user.status == 'P':
+                queryset = Homework.objects.filter(lecture__course__professors=user)
+            else:
+                queryset = Homework.objects.filter(lecture__course__students=user)
+            return queryset

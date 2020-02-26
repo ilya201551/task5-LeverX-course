@@ -22,7 +22,7 @@ class Course(models.Model):
 class Lecture(models.Model):
     owner = models.ForeignKey(AdvUser, on_delete=models.CASCADE, blank=False)
     topic = models.CharField(max_length=100, blank=False)
-    presentation = models.FileField(upload_to=None, blank=True)
+    presentation = models.FileField(upload_to='uploads/%Y/%m/%d/', blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=False, related_name='lectures')
 
     def __str__(self):
@@ -30,6 +30,7 @@ class Lecture(models.Model):
 
 
 class Homework(models.Model):
+    owner = models.ForeignKey(AdvUser, on_delete=models.CASCADE, blank=False)
     task = models.TextField(blank=False)
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, blank=False, related_name='tasks')
 

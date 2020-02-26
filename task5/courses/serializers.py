@@ -1,6 +1,7 @@
 from .models import (AdvUser,
                      Course,
                      Lecture,
+                     Homework,
                      )
 from rest_framework import serializers
 from rest_framework.validators import (UniqueValidator,
@@ -50,6 +51,95 @@ class UserSerializer(serializers.ModelSerializer):
                   ]
 
 
+"""Homework serializers"""
+
+
+class HomeworkSerializer(serializers.ModelSerializer):
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    task = serializers.CharField(min_length=5, max_length=1000)
+
+    def validate_lecture(self, value):
+        request = self.context['request']
+        if value in Lecture.objects.filter(course__professors=request.user):
+            return value
+        else:
+            raise serializers.ValidationError("""You cannot add a task to a course lecture
+                                              that you are not a Professor of.""")
+
+    class Meta:
+        validators = [UniqueTogetherValidator(queryset=Homework.objects.all(),
+                                              fields=['task', 'lecture'],
+                                              message='This lecture already has this task.'
+                                              )
+                      ]
+        model = Homework
+        fields = ['id',
+                  'owner',
+                  'task',
+                  'lecture',
+                  ]
+
+
+"""Lectures serializers"""
+
+
+class LecturesListSerializer(serializers.ModelSerializer):
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    tasks = serializers.StringRelatedField(many=True, read_only=True)
+
+    def validate_course(self, value):
+        request = self.context['request']
+        if value in Course.objects.filter(professors=request.user):
+            return value
+        else:
+            raise serializers.ValidationError("You are not a Professor in this course.")
+
+    class Meta:
+        validators = [UniqueTogetherValidator(queryset=Homework.objects.all(),
+                                              fields=['task', 'lecture'],
+                                              message='This lecture already has such a task.'
+                                              )
+                      ]
+        model = Lecture
+        fields = ['id',
+                  'owner',
+                  'topic',
+                  'presentation',
+                  'tasks',
+                  'course',
+                  ]
+
+
+class LecturesDetailSerializer(serializers.ModelSerializer):
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    tasks = HomeworkSerializer(many=True, read_only=True)
+
+    def validate_course(self, value):
+        request = self.context['request']
+        if value in Course.objects.filter(professors=request.user):
+            return value
+        else:
+            raise serializers.ValidationError("This lecture already has such a task.")
+
+    class Meta:
+        validators = [UniqueTogetherValidator(queryset=Lecture.objects.all(),
+                                              fields=['topic', 'course'],
+                                              message='This course already has a lecture with this name.'
+                                              )
+                      ]
+        model = Lecture
+        fields = ['id',
+                  'owner',
+                  'topic',
+                  'presentation',
+                  'tasks',
+                  'course',
+                  ]
+
+
 """Courses serializers"""
 
 
@@ -90,8 +180,7 @@ class CoursesStudentsListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['students',
-                  ]
+        fields = ['students']
 
 
 class CoursesProfessorsListSerializer(serializers.ModelSerializer):
@@ -100,28 +189,13 @@ class CoursesProfessorsListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['professors',
-                  ]
+        fields = ['professors']
 
 
-"""Lectures serializers"""
+class CoursesLecturesListSerializer(serializers.ModelSerializer):
 
-
-class LecturesSerializer(serializers.ModelSerializer):
-
-    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    tasks = serializers.StringRelatedField(many=True, read_only=True)
+    lectures = LecturesListSerializer(many=True, read_only=True)
 
     class Meta:
-        validators = [UniqueTogetherValidator(queryset=Lecture.objects.all(),
-                                              fields=['topic', 'course'],
-                                              )
-                      ]
-        model = Lecture
-        fields = ['id',
-                  'owner',
-                  'topic',
-                  'presentation',
-                  'tasks',
-                  'course',
-                  ]
+        model = Course
+        fields = ['lectures']
