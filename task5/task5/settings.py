@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'task5.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db',
+        'NAME': 'task_db',
         'USER': 'task5_user',
         'PASSWORD': 'task5',
         'HOST': '127.0.0.1',

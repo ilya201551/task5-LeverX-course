@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 class CoursesViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
-        if self.action == 'list' or self.action == 'create':
+        if self.action == 'list' or self.action == 'create' or self.action == 'retrieve':
             permission_classes = [IsAuthenticated,
                                   IsProfessorOrReadOnly,
                                   ]
@@ -38,7 +38,7 @@ class CoursesViewSet(viewsets.ModelViewSet):
             queryset = Course.objects.filter(students=user)
         return queryset
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
     def students(self, request, pk=None):
         data = Course.objects.get(pk=pk)
         serializer = CoursesStudentsListSerializer(data)

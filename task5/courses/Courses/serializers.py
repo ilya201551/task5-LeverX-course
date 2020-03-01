@@ -12,7 +12,13 @@ class CoursesSerializer(serializers.ModelSerializer):
         message='Course already exist.'
     )])
     lectures = serializers.StringRelatedField(many=True, read_only=True)
-    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    def create(self, validated_data):
+        request = self.context['request']
+        validated_data['owner'] = request.user
+        if request.user not in validated_data['professors']:
+            validated_data['professors'].append(request.user)
+        return super().create(validated_data)
 
     def validate(self, data):
         if 'professors' in data.keys():
@@ -34,6 +40,7 @@ class CoursesSerializer(serializers.ModelSerializer):
                   'professors',
                   'lectures',
                   ]
+        read_only_fields = ['owner']
 
 
 class CoursesStudentsListSerializer(serializers.ModelSerializer):

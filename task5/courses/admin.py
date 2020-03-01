@@ -4,7 +4,7 @@ from .models import (AdvUser,
                      Homework,
                      Course,
                      Mark,
-                     FinishedHomework,
+                     Solution,
                      Comment,
                      )
 
@@ -34,8 +34,8 @@ class CourseAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(FinishedHomework)
-class FinishedHomeworkAdmin(admin.ModelAdmin):
+@admin.register(Solution)
+class SolutionAdmin(admin.ModelAdmin):
     pass
 
 

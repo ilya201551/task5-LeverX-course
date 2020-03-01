@@ -58,28 +58,32 @@ class Homework(models.Model):
         return f'{self.task}'
 
 
-class FinishedHomework(models.Model):
-    solution = models.CharField(max_length=1000,
-                                blank=True)
+class Solution(models.Model):
+    link = models.CharField(max_length=150,
+                            blank=True)
     finished = models.BooleanField(blank=False,
                                    default=False)
     owner = models.ForeignKey(AdvUser,
                               on_delete=models.CASCADE,
                               blank=False)
+    homework = models.ForeignKey(Homework,
+                                 on_delete=models.CASCADE,
+                                 blank=False,
+                                 related_name='solution')
 
     def __str__(self):
-        return f'{self.solution}'
+        return f'{self.link}'
 
 
 class Mark(models.Model):
-    value = models.SmallIntegerField(blank=True)
+    value = models.SmallIntegerField(blank=False)
     owner = models.ForeignKey(AdvUser,
                               on_delete=models.CASCADE,
                               blank=False)
-    finished_homework = models.OneToOneField(FinishedHomework,
-                                             on_delete=models.CASCADE,
-                                             blank=False,
-                                             related_name='mark')
+    solution = models.OneToOneField(Solution,
+                                    on_delete=models.CASCADE,
+                                    blank=False,
+                                    related_name='mark')
 
     def __str__(self):
         return f'Mark - {self.value}'
@@ -92,7 +96,8 @@ class Comment(models.Model):
                               on_delete=models.CASCADE)
     mark = models.ForeignKey(Mark,
                              on_delete=models.CASCADE,
-                             blank=True)
+                             blank=False,
+                             related_name='comments')
 
     def __str__(self):
         return f'{self.owner} comment.'
