@@ -4,6 +4,7 @@ from .Courses import views as courses_views
 from .Lectures import views as lectures_views
 from .Homework import views as homework_views
 from .Solutions import views as solution_views
+from .Mark import views as mark_views
 from rest_framework.routers import DefaultRouter
 
 
@@ -23,4 +24,6 @@ urlpatterns = [
     path('homework/<int:pk>/', homework_views.HomeworkDetailView.as_view(), name='homework_detail'),
     path('solutions/', solution_views.SolutionListView.as_view(), name='solutions_list'),
     path('solutions/<int:pk>/', solution_views.SolutionDetailView.as_view(), name='solutions_detail'),
+    path('marks/', mark_views.MarkListView.as_view(), name='marks_list'),
+    path('marks/<int:pk>/', mark_views.MarkDetailView.as_view(), name='marks_detail'),
 ]
