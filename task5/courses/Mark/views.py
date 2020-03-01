@@ -1,6 +1,8 @@
 from ..models import Mark
 from ..permissions import IsProfessorOrReadOnly
-from ..Mark.serializers import MarkSerializer
+from ..Mark.serializers import (MarkSerializer,
+                                MarkDetailSerializer,
+                                )
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
@@ -26,7 +28,7 @@ class MarkDetailView(generics.RetrieveUpdateDestroyAPIView):
         permission_classes = [IsAuthenticated,
                               IsProfessorOrReadOnly,
                               ]
-        serializer_class = MarkSerializer
+        serializer_class = MarkDetailSerializer
 
         def get_queryset(self):
             user = self.request.user

@@ -37,7 +37,9 @@ class SolutionSerializer(serializers.ModelSerializer):
                   'finished',
                   'homework'
                   ]
-        read_only_fields = ['owner']
+        read_only_fields = ['owner',
+                            'mark',
+                            ]
 
 
 class SolutionDetailSerializer(serializers.ModelSerializer):
@@ -66,4 +68,6 @@ class SolutionDetailSerializer(serializers.ModelSerializer):
                   'finished',
                   'homework'
                   ]
-        read_only_fields = ['owner']
+        read_only_fields = ['owner',
+                            'mark',
+                            ]

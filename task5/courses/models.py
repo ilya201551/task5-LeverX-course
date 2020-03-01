@@ -100,4 +100,4 @@ class Comment(models.Model):
                              related_name='comments')
 
     def __str__(self):
-        return f'{self.owner} comment.'
+        return f'{self.text}'
