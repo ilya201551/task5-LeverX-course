@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'courses.AdvUser'
 
 INSTALLED_APPS = [
+    'drf_yasg',
     'rest_framework.authtoken',
     'courses.apps.CoursesConfig',
     'rest_framework',

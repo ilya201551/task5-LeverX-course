@@ -60,5 +60,5 @@ class MarkDetailSerializer(serializers.ModelSerializer):
                   'comments',
                   ]
         read_only_fields = ['owner',
-                            'comments'
+                            'comments',
                             ]

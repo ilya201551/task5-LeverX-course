@@ -36,7 +36,9 @@ class LecturesListSerializer(serializers.ModelSerializer):
                   'tasks',
                   'course',
                   ]
-        read_only_fields = ['owner', 'tasks']
+        read_only_fields = ['owner',
+                            'tasks',
+                            ]
 
 
 class LecturesDetailSerializer(serializers.ModelSerializer):
@@ -64,4 +66,6 @@ class LecturesDetailSerializer(serializers.ModelSerializer):
                   'tasks',
                   'course',
                   ]
-        read_only_fields = ['owner', 'tasks']
+        read_only_fields = ['owner',
+                            'tasks',
+                            ]
